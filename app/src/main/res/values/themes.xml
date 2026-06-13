@@ -1,0 +1,19 @@
+<resources>
+    <style name="Theme.QolHub" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">#FF6B00</item>
+        <item name="colorPrimaryDark">#0D0D0D</item>
+        <item name="android:windowBackground">#0D0D0D</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+    </style>
+
+    <style name="OrangeButton" parent="Widget.AppCompat.Button">
+        <item name="android:backgroundTint">#FF6B00</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="StopButton" parent="Widget.AppCompat.Button">
+        <item name="android:backgroundTint">#333333</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+</resources>
