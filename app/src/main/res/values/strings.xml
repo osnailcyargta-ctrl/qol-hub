@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">QoL Hub</string>
+    <string-array name="time_units">
+        <item>Seconds</item>
+        <item>Minutes</item>
+    </string-array>
+</resources>
