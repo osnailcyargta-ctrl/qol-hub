@@ -3,11 +3,13 @@ package com.qolhub.app
 import android.app.AppOpsManager
 import android.app.admin.DevicePolicyManager
 import android.content.*
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
@@ -24,7 +26,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dpm: DevicePolicyManager
     private lateinit var adminComponent: android.content.ComponentName
 
-    // ScreenTime
     private lateinit var llTop3: LinearLayout
     private lateinit var tvScreentimeNoPermission: TextView
 
@@ -52,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         if (hasUsageStatsPermission()) loadTop3()
     }
 
-    // ── Screen Timer ──────────────────────────────────────────────
     private fun setupScreenTimer() {
         val etTimerValue = findViewById<EditText>(R.id.et_timer_value)
         val spinnerUnit  = findViewById<Spinner>(R.id.spinner_timer_unit)
@@ -81,7 +81,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ── Screen Time ───────────────────────────────────────────────
     private fun setupScreenTime() {
         llTop3                   = findViewById(R.id.ll_top3)
         tvScreentimeNoPermission = findViewById(R.id.tv_screentime_no_permission)
@@ -111,14 +110,14 @@ class MainActivity : AppCompatActivity() {
             val pkg = entry.key
             val (fg, bg) = entry.value
             val appName = try { pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString() } catch (_: Exception) { pkg }
-            val icon = try { pm.getApplicationIcon(pkg) } catch (_: Exception) { null }
+            val icon: Drawable? = try { pm.getApplicationIcon(pkg) } catch (_: Exception) { null }
 
             val row = LayoutInflater.from(this).inflate(R.layout.item_screentime_row, llTop3, false)
             row.findViewById<TextView>(R.id.tv_rank).text = "#${idx + 1}"
             row.findViewById<TextView>(R.id.tv_st_app_name).text = appName
             row.findViewById<TextView>(R.id.tv_st_fg).text = "Foreground: ${formatDuration(fg)}"
             row.findViewById<TextView>(R.id.tv_st_bg).text = "Background: ${formatDuration(bg)}"
-            if (icon != null) row.findViewById<android.widget.ImageView>(R.id.iv_st_icon).setImageDrawable(icon)
+            if (icon != null) row.findViewById<ImageView>(R.id.iv_st_icon).setImageDrawable(icon)
             llTop3.addView(row)
         }
     }
