@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
     <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN"/>
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"
         xmlns:tools="http://schemas.android.com/tools"/>
@@ -25,10 +24,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".AppPickerActivity"
-            android:exported="false"/>
-
         <receiver
             android:name=".DeviceAdminReceiver"
             android:permission="android.permission.BIND_DEVICE_ADMIN"
@@ -43,16 +38,6 @@
 
         <service
             android:name=".ScreenTimerService"
-            android:foregroundServiceType="specialUse"
-            android:exported="false"/>
-
-        <service
-            android:name=".BatteryService"
-            android:foregroundServiceType="specialUse"
-            android:exported="false"/>
-
-        <service
-            android:name=".FocusService"
             android:foregroundServiceType="specialUse"
             android:exported="false"/>
 
