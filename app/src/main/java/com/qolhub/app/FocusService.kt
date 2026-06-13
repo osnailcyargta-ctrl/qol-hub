@@ -45,7 +45,7 @@ class FocusService : Service() {
                     if (getForegroundApp() == blockedPkg) {
                         val home = Intent(Intent.ACTION_MAIN).apply {
                             addCategory(Intent.CATEGORY_HOME)
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         }
                         startActivity(home)
                     }
