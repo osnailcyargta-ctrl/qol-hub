@@ -1,6 +1,8 @@
 package com.qolhub.app
 
 import android.app.*
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.*
@@ -48,7 +50,8 @@ class ScreenTimerService : Service() {
 
     private fun lockScreen() {
         val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        if (dpm.isAdminActive(android.content.ComponentName(this, DeviceAdminReceiver::class.java))) {
+        val adminComponent = ComponentName(this, DeviceAdminReceiver::class.java)
+        if (dpm.isAdminActive(adminComponent)) {
             dpm.lockNow()
         }
     }
