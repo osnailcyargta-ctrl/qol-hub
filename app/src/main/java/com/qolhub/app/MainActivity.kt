@@ -1,6 +1,8 @@
 package com.qolhub.app
 
 import android.app.AppOpsManager
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -19,21 +21,33 @@ class MainActivity : AppCompatActivity() {
         const val KEY_BATTERY_PERCENT = "battery_percent"
         const val KEY_FOCUS_MINUTES = "focus_minutes"
         const val KEY_FOCUS_PACKAGE = "focus_package"
+        const val REQUEST_ADMIN = 1001
     }
 
     private lateinit var prefs: SharedPreferences
+    private lateinit var dpm: DevicePolicyManager
+    private lateinit var adminComponent: ComponentName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         prefs = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        adminComponent = ComponentName(this, DeviceAdminReceiver::class.java)
+
+        if (!dpm.isAdminActive(adminComponent)) {
+            val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent)
+                putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Needed for screen lock feature.")
+            }
+            startActivityForResult(intent, REQUEST_ADMIN)
+        }
 
         setupScreenTimer()
         setupBatteryAlert()
         setupFocusMode()
     }
 
-    // ── Screen Timer ──────────────────────────────────────────────
     private fun setupScreenTimer() {
         val etTimerValue = findViewById<EditText>(R.id.et_timer_value)
         val spinnerUnit  = findViewById<Spinner>(R.id.spinner_timer_unit)
@@ -52,7 +66,6 @@ class MainActivity : AppCompatActivity() {
             val value = etTimerValue.text.toString().toIntOrNull() ?: 30
             val unit  = spinnerUnit.selectedItemPosition
             prefs.edit().putInt(KEY_TIMER_VALUE, value).putInt(KEY_TIMER_UNIT, unit).apply()
-
             val millis = if (unit == 0) value * 1000L else value * 60_000L
             val intent = Intent(this, ScreenTimerService::class.java).apply {
                 putExtra("duration_ms", millis)
@@ -68,9 +81,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ── Battery Alert ─────────────────────────────────────────────
     private fun setupBatteryAlert() {
-        val etBattery = findViewById<EditText>(R.id.et_battery_percent)
+        val etBattery   = findViewById<EditText>(R.id.et_battery_percent)
         val btnBatStart = findViewById<Button>(R.id.btn_battery_start)
         val btnBatStop  = findViewById<Button>(R.id.btn_battery_stop)
 
@@ -93,10 +105,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ── Focus Mode ────────────────────────────────────────────────
     private fun setupFocusMode() {
-        val etPackage = findViewById<EditText>(R.id.et_focus_package)
-        val etMinutes = findViewById<EditText>(R.id.et_focus_minutes)
+        val etPackage     = findViewById<EditText>(R.id.et_focus_package)
+        val etMinutes     = findViewById<EditText>(R.id.et_focus_minutes)
         val btnFocusStart = findViewById<Button>(R.id.btn_focus_start)
         val btnFocusStop  = findViewById<Button>(R.id.btn_focus_stop)
 
@@ -109,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please grant Usage Access permission", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
-            val pkg = etPackage.text.toString().trim()
+            val pkg  = etPackage.text.toString().trim()
             val mins = etMinutes.text.toString().toIntOrNull() ?: 25
             if (pkg.isEmpty()) {
                 Toast.makeText(this, "Enter app package name!", Toast.LENGTH_SHORT).show()
@@ -133,7 +144,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun hasUsageStatsPermission(): Boolean {
         val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), packageName)
+        val mode   = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), packageName)
         return mode == AppOpsManager.MODE_ALLOWED
     }
 }
